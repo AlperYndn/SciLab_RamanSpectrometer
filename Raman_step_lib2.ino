@@ -30,7 +30,7 @@ void loop() {
   limitSwitch.loop();
   int lsCount = limitSwitch.getCount() % 3;
 
-  pdMeasure=analogRead(A0);
+  pdMeasure=analogRead(PHOTORESISTOR_PIN);
   
   if(lsCount == 0 && !Raman_flag){
     stepper.setMaxSpeed(1000);
