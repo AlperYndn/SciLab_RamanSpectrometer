@@ -1,37 +1,45 @@
 #include <ezButton.h>
 #include <AccelStepper.h>
 
+#define LIMIT_SWITCH_PIN  6
+#define MOTOR_STEP_PIN    7  
+#define MOTOR_DIR_PIN     2
+#define MOTOR_INTERFACE_TYPE 1 
+#define PHOTORESISTOR_PIN A0
 
-int A=0;
+// ls == limit switch
+// pos == position
+// pd == photodiode
 
-ezButton limitSwitch(6);
-AccelStepper stepper(1, 7, 2);
+ezButton limitSwitch(LIMIT_SWITCH_PIN);
+AccelStepper stepper(MOTOR_INTERFACE_TYPE, MOTOR_STEP_PIN, MOTOR_DIR_PIN);
+
 bool LS_flag = false;
 bool Raman_flag = false;
 float posDegree = 0.00;
-int posStep;
+int posStep = 0;
+int pdMeasure = 0;
 
 void setup() {
   Serial.begin(115200);
   limitSwitch.setDebounceTime(50);
-  pinMode(A0,INPUT);
+  pinMode(PHOTORESISTOR_PIN,INPUT);
 }
 
 void loop() {
   limitSwitch.loop();
-  unsigned long count = limitSwitch.getCount();
-  int myCount = count % 3;
+  int lsCount = limitSwitch.getCount() % 3;
 
-  A=analogRead(A0);
+  pdMeasure=analogRead(A0);
   
-  if(myCount == 0 && !Raman_flag){
+  if(lsCount == 0 && !Raman_flag){
     stepper.setMaxSpeed(1000);
     stepper.setSpeed(500);
     stepper.runSpeed();
     stepper.setCurrentPosition(0);
   }
   
-  if(myCount == 1 && !Raman_flag){
+  if(lsCount == 1 && !Raman_flag){
     stepper.moveTo(-960);
     stepper.setSpeed(400);
     stepper.runSpeedToPosition();
@@ -51,7 +59,7 @@ void loop() {
        Serial.print("|");
        Serial.print(posDegree);
        Serial.print("|");
-       Serial.println(A);
+       Serial.println(pdMeasure);
     }
   }
 
@@ -61,7 +69,7 @@ void loop() {
     posStep = 0;
   }
 
-  if(myCount == 2 && !Raman_flag){
+  if(lsCount == 2 && !Raman_flag){
     stepper.moveTo(-400);
     stepper.setSpeed(400);
     stepper.runSpeedToPosition();
