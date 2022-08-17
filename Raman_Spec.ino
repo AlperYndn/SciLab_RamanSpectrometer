@@ -55,11 +55,13 @@ void loop() {
     if(stepper.isRunning()){
       posStep = stepper.currentPosition() + 960;
       posDegree = posStep * 0.1125;
-       Serial.print(posStep);
-       Serial.print("|");
-       Serial.print(posDegree);
-       Serial.print("|");
-       Serial.println(pdMeasure);
+      
+      String str_posDegree = String(posDegree);
+      String str_pdMeasure = String(pdMeasure);
+
+      String txData = String("A" + str_posDegree + "B" + str_pdMeasure + "C");
+      Serial.println(txData);
+      
     }
   }
 
